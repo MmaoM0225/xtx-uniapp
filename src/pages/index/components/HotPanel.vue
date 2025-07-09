@@ -13,42 +13,35 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 })
 
+
 // 热门商品点击处理
 const onHotClick = (item: HotItem, index: number) => {
   console.log('点击热门商品:', item, index)
+  
+  // 跳转到热门页面，只传递type参数
+  uni.navigateTo({
+    url: `/pages/hot/hot?type=${item.type}`
+  }).catch((error) => {
+    console.error('跳转热门页面失败:', error)
+  })
+}
 
-  if (item.target) {
-    // 如果是外部链接，可以在这里处理
-    if (item.target.startsWith('http')) {
-      uni.showModal({
-        title: '提示',
-        content: '即将跳转到外部链接',
-        success: (res) => {
-          if (res.confirm) {
-            uni.showToast({
-              title: '功能开发中...',
-              icon: 'none',
-            })
-          }
-        },
-      })
-    } else {
-      // 内部页面跳转
-      uni
-        .navigateTo({
-          url: item.target,
-        })
-        .catch(() => {
-          uni.showToast({
-            title: '页面跳转失败',
-            icon: 'none',
-          })
-        })
-    }
+// 更多按钮点击处理
+const onMoreClick = () => {
+  // 如果有数据，使用第一个item的type跳转
+  if (props.list.length > 0) {
+    const firstItem = props.list[0]
+    uni.navigateTo({
+      url: `/pages/hot/hot?type=${firstItem.type}`
+    }).catch((error) => {
+      console.error('更多按钮跳转失败:', error)
+    })
   } else {
-    uni.showToast({
-      title: '该商品暂无跳转链接',
-      icon: 'none',
+    // 默认跳转到第一个热门页面
+    uni.navigateTo({
+      url: `/pages/hot/hot?type=1`
+    }).catch((error) => {
+      console.error('更多按钮默认跳转失败:', error)
     })
   }
 }
@@ -65,7 +58,7 @@ const handleImageError = (e: any) => {
     <!-- 热门商品标题 -->
     <view class="hot-title">
       <text class="title-text">热门推荐</text>
-      <text class="more-text">更多 ></text>
+      <text class="more-text" @click="onMoreClick">更多 ></text>
     </view>
 
     <!-- 加载状态 -->
@@ -175,6 +168,15 @@ const handleImageError = (e: any) => {
     .more-text {
       font-size: 24rpx;
       color: #27ba9b;
+      padding: 10rpx;
+      border-radius: 6rpx;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      &:active {
+        background: rgba(39, 186, 155, 0.1);
+        transform: scale(0.95);
+      }
     }
   }
 

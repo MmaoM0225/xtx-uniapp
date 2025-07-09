@@ -106,11 +106,6 @@ const getGuessData = async (isLoadMore: boolean = false) => {
     if (!isLoadMore) {
       guessList.value = []
     }
-
-    uni.showToast({
-      title: '获取猜你喜欢数据失败',
-      icon: 'none',
-    })
   } finally {
     if (isLoadMore) {
       isLoadingMore.value = false
@@ -124,12 +119,10 @@ const getGuessData = async (isLoadMore: boolean = false) => {
 }
 
 // 商品点击处理
-const onGuessClick = (item: GuessItem, index: number) => {
-  console.log('点击猜你喜欢商品:', item, index)
-
-  uni.showToast({
-    title: `查看商品: ${item.name}`,
-    icon: 'none',
+const onGuessClick = (item: GuessItem) => {
+  // 跳转到商品详情页
+  uni.navigateTo({
+    url: `/pages/goods/goods?id=${item.id}`,
   })
 }
 
@@ -156,6 +149,9 @@ const loadMoreData = async () => {
 
 // 重新获取数据
 const resetAndRefresh = async () => {
+  guessList.value = []
+  currentPage.value = 1
+  hasMore.value = true
   await getGuessData(false)
 }
 
@@ -177,12 +173,6 @@ onMounted(() => {
     <!-- 猜你喜欢标题 -->
     <view class="guess-title">
       <text class="title-text">猜你喜欢</text>
-    </view>
-
-    <!-- 调试信息 -->
-    <view style="font-size: 20rpx; color: #999; padding: 10rpx">
-      Debug: loading={{ loading }}, 加载更多={{ isLoadingMore }}, 数据条数={{ guessList.length }},
-      当前页={{ currentPage }}, 还有更多={{ hasMore }}
     </view>
 
     <!-- 加载状态 -->
@@ -211,11 +201,8 @@ onMounted(() => {
         class="guess-item"
         v-for="(item, index) in guessList"
         :key="item.id"
-        @click="onGuessClick(item, index)"
+        @click="onGuessClick(item)"
       >
-        <!-- 调试信息 -->
-        <!-- <text style="font-size: 20rpx; color: #999;">{{ item.id }} - {{ item.name }}</text> -->
-        <!-- 商品图片 -->
         <view class="guess-image-wrapper">
           <image
             :src="item.picture"

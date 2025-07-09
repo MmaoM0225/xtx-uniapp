@@ -22,18 +22,6 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 })
 
-// 默认快捷入口数据（作为兜底数据）
-const defaultShortcuts: ShortcutItem[] = [
-  { id: 1, icon: '🛍️', name: '超市购物' },
-  { id: 2, icon: '🍎', name: '生鲜果蔬' },
-  { id: 3, icon: '👔', name: '服装搭配' },
-  { id: 4, icon: '📱', name: '数码家电' },
-  { id: 5, icon: '🏠', name: '家居用品' },
-  { id: 6, icon: '💄', name: '美妆护肤' },
-  { id: 7, icon: '📚', name: '图书文具' },
-  { id: 8, icon: '🎮', name: '运动户外' },
-]
-
 // 根据分类名称获取对应图标
 const getIconByName = (name: string): string => {
   const iconMap: Record<string, string> = {
@@ -63,10 +51,6 @@ const getIconByName = (name: string): string => {
 
 // 显示用的快捷入口数据
 const shortcuts = computed<ShortcutItem[]>(() => {
-  if (props.list.length === 0) {
-    return defaultShortcuts
-  }
-
   // 转换API数据为快捷入口格式（显示全部分类）
   const apiShortcuts = props.list.map((item: CategoryItem, index: number) => ({
     id: item.id,
@@ -128,7 +112,7 @@ const onShortcutClick = (item: ShortcutItem, index: number) => {
     </view>
 
     <!-- 分类网格 -->
-    <view v-else class="category-grid">
+    <view v-else-if="shortcuts.length > 0" class="category-grid">
       <view
         class="category-item"
         v-for="(item, index) in shortcuts"
@@ -149,6 +133,13 @@ const onShortcutClick = (item: ShortcutItem, index: number) => {
 
         <!-- 分类名称 -->
         <text class="category-name">{{ item.name }}</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view v-else class="category-empty">
+      <view class="empty-content">
+        <text class="empty-text">暂无分类数据</text>
       </view>
     </view>
   </view>
@@ -259,6 +250,25 @@ const onShortcutClick = (item: ShortcutItem, index: number) => {
         color: #666;
         text-align: center;
         line-height: 1.2;
+      }
+    }
+  }
+
+  .category-empty {
+    padding: 60rpx 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20rpx;
+
+      .empty-text {
+        font-size: 28rpx;
+        color: #999;
       }
     }
   }
