@@ -37,7 +37,7 @@ const onGetPhoneNumber = async (event: any) => {
 const onDemoLogin = async () => {
   try {
     // 模拟手机号登录
-    const res = await postLoginDemo('13123456789')
+    const res = await postLoginDemo('13123456111')
     // 存储用户信息
     memberStore.setProfile(res.result)
     // 成功提示

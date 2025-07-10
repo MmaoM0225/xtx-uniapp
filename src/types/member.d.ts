@@ -15,8 +15,19 @@ export type LoginResult = {
   account: string
 }
 
-// 登录接口响应数据类型
-export type LoginResponse = {
-  msg: string
-  result: LoginResult
-} 
+// 用户详细信息
+export type ProfileDetail = {
+  id: string
+  avatar: string
+  nickname: string
+  account: string
+  gender: '女' | '男'
+  birthday: string
+  fullLocation: string
+  profession: string
+  // 省市区编码
+  provinceCode?: string
+  cityCode?: string
+  countyCode?: string
+}
+

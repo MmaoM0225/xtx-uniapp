@@ -11,7 +11,16 @@ const toLogin = () => {
 
 // 跳转到设置页
 const toSettings = () => {
-  uni.navigateTo({ url: '/pages/settings/settings' })
+  uni.navigateTo({ url: '/pagesMember/settings/settings' })
+}
+
+// 跳转到个人信息页
+const toProfile = () => {
+  if (memberStore.profile) {
+    uni.navigateTo({ url: '/pagesMember/profile/profile' })
+  } else {
+    uni.navigateTo({ url: '/pages/login/login' })
+  }
 }
 
 // 订单类型
@@ -33,7 +42,7 @@ const orderTypes = [
     <view class="nav-content">
       <template v-if="memberStore.profile">
         <!-- 已登录 -->
-        <view class="user-info">
+        <view class="user-info" @tap="toProfile">
           <view class="avatar">
             <image :src="memberStore.profile.avatar" mode="aspectFill" />
           </view>
