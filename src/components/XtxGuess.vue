@@ -199,7 +199,7 @@ onMounted(() => {
     <view v-else class="guess-grid">
       <view
         class="guess-item"
-        v-for="(item, index) in guessList"
+        v-for="item in guessList"
         :key="item.id"
         @click="onGuessClick(item)"
       >
