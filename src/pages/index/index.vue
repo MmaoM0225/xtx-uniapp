@@ -6,6 +6,7 @@ import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/services/home'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
+import { useGuessList } from '@/composables'
 
 // 轮播图数据类型（组件使用）
 interface SwiperItem {
@@ -55,8 +56,10 @@ const categoryLoading = ref(false)
 const hotList = ref<HotItem[]>([])
 const hotLoading = ref(false)
 
-// 猜你喜欢组件引用
+// 猜你喜欢组件实例
 const guessRef = ref<any>(null)
+// 使用组合式函数
+const { onScrollToLower } = useGuessList(guessRef)
 
 // 下拉刷新状态
 const refresherTriggered = ref(false)
@@ -183,14 +186,6 @@ const onBannerClick = (item: SwiperItem, index: number) => {
 // 轮播图切换处理
 const onBannerChange = (current: number) => {
   console.log('轮播图切换到:', current)
-}
-
-// 滚动到底部处理
-const onScrollToLower = () => {
-  console.log('滚动到底部，开始加载更多数据')
-  if (guessRef.value) {
-    guessRef.value.loadMoreData()
-  }
 }
 
 // 下拉刷新处理
