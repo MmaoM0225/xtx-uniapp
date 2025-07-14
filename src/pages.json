@@ -123,6 +123,17 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pagesOrder/order",
+			"pages": [
+				{
+					"path": "order",
+					"style": {
+						"navigationBarTitleText": "订单"
+					}
+				}
+			]
 		}
 	],
 	"preloadRule": {

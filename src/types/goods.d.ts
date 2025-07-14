@@ -50,9 +50,7 @@ export type GoodsResult = {
       /** 可选值名称 */
       name: string
       /** 可选值图片 */
-      picture: string
-      /** 是否可用 */
-      available: boolean
+      picture: string | null
       /** 可选值描述 */
       desc: string
     }[]

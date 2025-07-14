@@ -6,11 +6,14 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getGoodsByIdAPI } from '@/services/goods'
+import { addToCartAPI } from '@/services/cart'
 import type { GoodsResult } from '@/types/goods'
+import type { AddressItem } from '@/types/address'
 
 // 引入组件
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
+import SkuPanel from './components/SkuPanel.vue'
 
 // 商品详情
 const goods = ref<GoodsResult>()
@@ -21,7 +24,15 @@ const loading = ref(false)
 // 弹出层组件实例
 const popup = ref<UniHelper.UniPopupInstance>()
 // 当前弹出层类型
-const popupName = ref<'address' | 'service'>()
+const popupName = ref<'address' | 'service' | 'sku'>()
+// 选中的收货地址
+const selectedAddress = ref<AddressItem>()
+// 选中的SKU信息
+const selectedSkuInfo = ref<{
+  skuId: string
+  quantity: number
+  specs: string
+} | null>(null)
 
 // 确保popup存在
 const safePopup = computed(() => {
@@ -69,6 +80,90 @@ const openPopup = (name: typeof popupName.value) => {
   popupName.value = name
   // @ts-ignore
   popup.value?.open()
+}
+
+// 选择收货地址
+const onAddressSelect = (address: AddressItem) => {
+  selectedAddress.value = address
+}
+
+// 处理加入购物车
+const onAddToCart = async (skuId: string, quantity: number) => {
+  // 显示加载提示
+  uni.showLoading({
+    title: '加入购物车中...',
+    mask: true
+  })
+  
+  try {
+    // 调用加入购物车API
+    const res = await addToCartAPI({
+      skuId,
+      count: quantity
+    })
+    
+    // 隐藏加载提示
+    uni.hideLoading()
+    
+    // 显示成功提示
+    uni.showToast({
+      title: '已加入购物车',
+      icon: 'success'
+    })
+    
+    // 关闭弹出层
+    popup.value?.close?.()
+    
+    // 可选：更新购物车数量徽章
+    // TODO: 可以在这里触发购物车数量更新
+    
+  } catch (error: any) {
+    // 隐藏加载提示
+    uni.hideLoading()
+    
+    console.error('加入购物车失败:', error)
+    
+    // 根据错误类型显示不同的提示
+    let errorMessage = '加入购物车失败'
+    
+    if (error?.data?.msg) {
+      errorMessage = error.data.msg
+    } else if (error?.message) {
+      errorMessage = error.message
+    }
+    
+    // 显示错误提示
+    uni.showToast({
+      title: errorMessage,
+      icon: 'none',
+      duration: 3000
+    })
+  }
+}
+
+// 处理立即购买
+const onBuyNow = async (skuId: string, quantity: number) => {
+  try {
+    // TODO: 跳转到订单页面
+    console.log('立即购买:', { skuId, quantity })
+    
+    uni.navigateTo({
+      url: `/pages/order/order?skuId=${skuId}&quantity=${quantity}`
+    })
+    
+    // 关闭弹出层
+    popup.value?.close?.()
+  } catch (error) {
+    uni.showToast({
+      title: '购买失败',
+      icon: 'none'
+    })
+  }
+}
+
+// 关闭SKU弹出层
+const onSkuClose = () => {
+  popup.value?.close?.()
 }
 
 onMounted(() => {
@@ -155,13 +250,19 @@ onLoad((query) => {
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <view class="item arrow" @tap="openPopup('sku')">
           <text class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis" v-if="selectedSkuInfo">
+            {{ selectedSkuInfo.specs }}
+          </text>
+          <text class="text ellipsis" v-else> 请选择商品规格 </text>
         </view>
         <view class="item arrow" @tap="openPopup('address')">
           <text class="label">送至</text>
-          <text class="text ellipsis"> 请选择收获地址 </text>
+          <text class="text ellipsis" v-if="selectedAddress">
+            {{ selectedAddress.fullLocation }} {{ selectedAddress.address }}
+          </text>
+          <text class="text ellipsis" v-else> 请选择收获地址 </text>
         </view>
         <view class="item arrow" @tap="openPopup('service')">
           <text class="label">服务</text>
@@ -171,8 +272,16 @@ onLoad((query) => {
 
       <!-- 底部弹出层 -->
       <uni-popup type="bottom" ref="popup" :safe-area="false">
+        <!-- SKU选择 -->
+        <SkuPanel 
+          v-if="popupName === 'sku' && goods" 
+          :goods="goods"
+          @addToCart="onAddToCart"
+          @buyNow="onBuyNow"
+          @close="onSkuClose"
+        />
         <!-- 配送地址 -->
-        <AddressPanel v-if="popupName === 'address'" />
+        <AddressPanel v-else-if="popupName === 'address'" @select="onAddressSelect" />
         <!-- 服务说明 -->
         <ServicePanel v-else-if="popupName === 'service'" />
       </uni-popup>
@@ -241,8 +350,8 @@ onLoad((query) => {
       </navigator>
     </view>
     <view class="buttons">
-      <view class="addcart"> 加入购物车 </view>
-      <view class="buynow"> 立即购买 </view>
+      <view class="addcart" @tap="openPopup('sku')"> 加入购物车 </view>
+      <view class="buynow" @tap="openPopup('sku')"> 立即购买 </view>
     </view>
   </view>
 </template>
