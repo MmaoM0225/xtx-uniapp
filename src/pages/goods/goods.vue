@@ -144,16 +144,17 @@ const onAddToCart = async (skuId: string, quantity: number) => {
 // 处理立即购买
 const onBuyNow = async (skuId: string, quantity: number) => {
   try {
-    // TODO: 跳转到订单页面
     console.log('立即购买:', { skuId, quantity })
     
+    // 跳转到订单页面，传递立即购买参数
     uni.navigateTo({
-      url: `/pages/order/order?skuId=${skuId}&quantity=${quantity}`
+      url: `/pagesOrder/order/order?type=now&skuId=${skuId}&count=${quantity}`
     })
     
     // 关闭弹出层
     popup.value?.close?.()
   } catch (error) {
+    console.error('立即购买失败:', error)
     uni.showToast({
       title: '购买失败',
       icon: 'none'

@@ -196,9 +196,9 @@ const checkout = () => {
     return
   }
   
-  // TODO: 跳转到结算页面
+  // 跳转到订单页面，传递购物车类型参数
   uni.navigateTo({
-    url: '/pages/order/order'
+    url: '/pagesOrder/order/order?type=cart'
   })
 }
 
@@ -656,14 +656,14 @@ onShow(() => {
   .button-grounp {
     margin-left: auto;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     text-align: center;
     line-height: 72rpx;
     font-size: 13px;
     color: #fff;
 
     .button {
-      width: 240rpx;
+      width: 180rpx;
       margin: 0 10rpx;
       border-radius: 72rpx;
     }

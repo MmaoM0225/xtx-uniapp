@@ -134,6 +134,19 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pagesOrder/detail",
+			"pages": [
+				{
+					"path": "detail",
+					"style": {
+						"navigationStyle": "custom",
+						"navigationBarTextStyle": "white",
+						"navigationBarTitleText": "订单详情"
+					}
+				}
+			]
 		}
 	],
 	"preloadRule": {
